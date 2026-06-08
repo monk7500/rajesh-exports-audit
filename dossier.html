@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rajesh Exports — Allegations Audit Dossier</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --surface: #111720;
+    --surface2: #161e2a;
+    --border: #1e2d42;
+    --active: #e84545;
+    --review: #f5a623;
+    --remediated: #00d68f;
+    --historical: #7b92ae;
+    --text: #c8d8ed;
+    --text-dim: #7b92ae;
+    --muted: #4a5e78;
+    --navy: #1B2A4A;
+    --accent: #5b8dee;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:14px; line-height:1.65; }
+
+  /* NAV */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 48px;
+    display: flex;
+    gap: 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  nav a { color: var(--text-dim); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; }
+  nav a:hover { color: var(--text); }
+  nav a.active { color: var(--accent); border-bottom: 1px solid var(--accent); padding-bottom: 1px; }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 32px 48px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #e84545, #f5a623, #00d68f, #7b92ae);
+  }
+  .header-meta { font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:16px; }
+  h1 { font-family:var(--mono); font-size:22px; font-weight:700; color:#fff; letter-spacing:-0.02em; margin-bottom:6px; }
+  .subtitle { color:var(--text-dim); font-size:13px; font-style:italic; font-weight:300; }
+
+  /* STATS */
+  .stats-bar { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--border); }
+  .stat { padding:20px 24px; border-right:1px solid var(--border); text-align:center; }
+  .stat:last-child { border-right:none; }
+  .stat-num { font-family:var(--mono); font-size:36px; font-weight:700; line-height:1; margin-bottom:4px; }
+  .stat-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; font-family:var(--mono); }
+
+  /* MAIN */
+  main { max-width:1100px; margin:0 auto; padding:0 48px 80px; }
+
+  /* SECTION */
+  .section-header { margin:48px 0 20px; border-bottom:1px solid var(--border); padding-bottom:10px; }
+  .section-header h2 { font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; color:var(--text); }
+  .section-header p { font-size:12px; color:var(--text-dim); margin-top:4px; font-style:italic; }
+
+  /* ALLEGATION CARD */
+  .allegation {
+    border:1px solid var(--border);
+    border-radius:4px;
+    margin-bottom:14px;
+    background:var(--surface);
+    position:relative;
+    overflow:hidden;
+  }
+  .allegation-bar { position:absolute; top:0; left:0; bottom:0; width:4px; }
+  .bar-active { background:var(--active); }
+  .bar-review { background:var(--review); }
+  .bar-remediated { background:var(--remediated); }
+  .bar-historical { background:var(--historical); }
+
+  .allegation-inner { padding:18px 20px 18px 24px; }
+  .allegation-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+  .allegation-id { font-family:var(--mono); font-size:11px; color:var(--muted); flex-shrink:0; padding-top:2px; }
+  .allegation-title { font-weight:600; font-size:14px; color:#e8f0fb; flex:1; }
+  .status-badge { font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; padding:3px 9px; border-radius:3px; flex-shrink:0; }
+  .badge-active { background:rgba(232,69,69,0.12); color:var(--active); border:1px solid rgba(232,69,69,0.25); }
+  .badge-review { background:rgba(245,166,35,0.12); color:var(--review); border:1px solid rgba(245,166,35,0.25); }
+  .badge-remediated { background:rgba(0,214,143,0.12); color:var(--remediated); border:1px solid rgba(0,214,143,0.25); }
+  .badge-historical { background:rgba(123,146,174,0.12); color:var(--historical); border:1px solid rgba(123,146,174,0.25); }
+
+  .allegation-fields { display:grid; grid-template-columns:160px 1fr; gap:0; }
+  .field-row { display:contents; }
+  .field-key { font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; padding:5px 12px 5px 0; border-bottom:1px solid rgba(30,45,66,0.4); align-self:start; }
+  .field-val { font-size:12.5px; color:var(--text-dim); padding:5px 0; border-bottom:1px solid rgba(30,45,66,0.4); line-height:1.6; }
+  .field-row:last-child .field-key,
+  .field-row:last-child .field-val { border-bottom:none; }
+  .field-val strong { color:var(--text); font-weight:600; }
+  .field-val em { color:var(--review); font-style:normal; }
+
+  /* CHRONOLOGY TABLE */
+  .chrono-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:12.5px; }
+  .chrono-table th { text-align:left; color:var(--muted); font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; border-bottom:1px solid var(--border); padding:8px 12px; background:var(--surface2); }
+  .chrono-table td { padding:8px 12px; border-bottom:1px solid rgba(30,45,66,0.4); color:var(--text-dim); vertical-align:top; }
+  .chrono-table tr:last-child td { border-bottom:none; }
+  .chrono-table td:first-child { font-family:var(--mono); font-size:11px; color:var(--muted); white-space:nowrap; }
+  .chrono-table td:nth-child(2) { font-weight:600; color:var(--text); white-space:nowrap; }
+
+  /* PERSONS TABLE */
+  .persons-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:12.5px; }
+  .persons-table th { text-align:left; color:var(--muted); font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; border-bottom:1px solid var(--border); padding:8px 12px; background:var(--surface2); }
+  .persons-table td { padding:8px 12px; border-bottom:1px solid rgba(30,45,66,0.4); color:var(--text-dim); vertical-align:top; }
+  .persons-table tr:last-child td { border-bottom:none; }
+  .persons-table td:first-child { font-weight:600; color:var(--text); white-space:nowrap; }
+  .persons-table td:nth-child(2) { font-family:var(--mono); font-size:11px; color:var(--muted); white-space:nowrap; }
+
+  /* LAWS TABLE */
+  .laws-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:12.5px; }
+  .laws-table th { text-align:left; color:var(--muted); font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; border-bottom:1px solid var(--border); padding:8px 12px; background:var(--surface2); }
+  .laws-table td { padding:8px 12px; border-bottom:1px solid rgba(30,45,66,0.4); color:var(--text-dim); vertical-align:top; }
+  .laws-table tr:last-child td { border-bottom:none; }
+  .laws-table td:first-child { font-family:var(--mono); font-size:11px; color:var(--accent); }
+
+  /* ACTIONS TABLE */
+  .actions-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:12.5px; }
+  .actions-table th { text-align:left; color:var(--muted); font-family:var(--mono); font-size:10px; letter-spacing:0.1em; text-transform:uppercase; border-bottom:1px solid var(--border); padding:8px 12px; background:var(--surface2); }
+  .actions-table td { padding:8px 12px; border-bottom:1px solid rgba(30,45,66,0.4); color:var(--text-dim); vertical-align:top; }
+  .actions-table tr:last-child td { border-bottom:none; }
+  .actions-table td:first-child { font-family:var(--mono); font-size:11px; color:var(--muted); text-align:center; }
+  .actions-table td:nth-child(3) { font-weight:600; color:var(--text); }
+
+  /* OBSERVATIONS */
+  .obs-block { background:var(--surface); border:1px solid var(--border); border-radius:4px; margin-bottom:12px; }
+  .obs-title { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent); padding:14px 20px 10px; border-bottom:1px solid var(--border); }
+  .obs-body { padding:14px 20px; font-size:13px; color:var(--text-dim); line-height:1.75; }
+  .obs-body ul { padding-left:20px; }
+  .obs-body li { margin-bottom:10px; }
+
+  /* SOURCES */
+  .source-list { list-style:none; padding:0; }
+  .source-list li { font-size:12.5px; color:var(--text-dim); padding:7px 0; border-bottom:1px solid rgba(30,45,66,0.4); display:flex; gap:12px; }
+  .source-list li:last-child { border-bottom:none; }
+  .src-bullet { font-family:var(--mono); color:var(--muted); flex-shrink:0; }
+
+  /* DISCLAIMER */
+  .disclaimer { background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:16px 20px; font-size:12px; color:var(--muted); font-style:italic; margin-top:40px; }
+
+  /* FOOTER */
+  footer { border-top:1px solid var(--border); padding:20px 48px; font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; justify-content:space-between; }
+
+  /* ANIM */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .allegation { animation:fadeIn 0.35s ease both; }
+  .allegation:nth-child(1){animation-delay:0.04s}
+  .allegation:nth-child(2){animation-delay:0.08s}
+  .allegation:nth-child(3){animation-delay:0.12s}
+  .allegation:nth-child(4){animation-delay:0.16s}
+  .allegation:nth-child(5){animation-delay:0.20s}
+  .allegation:nth-child(6){animation-delay:0.24s}
+  .allegation:nth-child(7){animation-delay:0.28s}
+  .allegation:nth-child(8){animation-delay:0.32s}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="dossier.html" class="active">Allegations Dossier</a>
+  <a href="index.html">Verification Matrix</a>
+</nav>
+
+<header>
+  <div class="header-meta">Allegations Audit Dossier · REL-AUDIT-2026-001 · 08 June 2026</div>
+  <h1>RAJESH EXPORTS LIMITED — ALLEGATIONS AUDIT DOSSIER</h1>
+  <div class="subtitle">NSE: RAJESHEXPO | BSE: 531500 · Coverage: 2013–2026 · 14 Allegations Tracked · For investigative and regulatory reference</div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" style="color:var(--active)">8</div><div class="stat-label">Active / Current</div></div>
+  <div class="stat"><div class="stat-num" style="color:var(--review)">1</div><div class="stat-label">Under Review</div></div>
+  <div class="stat"><div class="stat-num" style="color:var(--remediated)">1</div><div class="stat-label">Remediated</div></div>
+  <div class="stat"><div class="stat-num" style="color:var(--historical)">4</div><div class="stat-label">Historical</div></div>
+</div>
+
+<main>
+
+<!-- EXEC SUMMARY -->
+<div class="section-header">
+  <h2>I. Executive Summary</h2>
+</div>
+<div style="font-size:13px;color:var(--text-dim);line-height:1.8;margin-bottom:32px;max-width:900px">
+  <p style="margin-bottom:12px">Rajesh Exports Limited (REL) is a Bengaluru-headquartered gold jewellery manufacturer and exporter, founded in 1995 and listed on NSE and BSE. Through its 2015 acquisition of Valcambi SA — the world's largest gold refinery, headquartered in Switzerland — REL projected itself as one of India's largest companies by consolidated revenue, routinely reporting ₹2–3 lakh crore turnover.</p>
+  <p style="margin-bottom:12px">On <strong style="color:var(--text)">3 June 2026</strong>, SEBI issued a 109-page ex parte interim order (<strong style="color:var(--text)">WTM/KCV/IVD-1/001/2026-27</strong>) alleging that REL misrepresented approximately <strong style="color:var(--active)">₹15.15 lakh crore (~USD 180 billion)</strong> in subsidiary-linked revenues between FY2021 and FY2025 — equivalent to roughly 99.80% of all revenues attributed to overseas subsidiaries. The order bars both REL and its Executive Chairman Rajesh Mehta from the securities markets.</p>
+  <p>This dossier consolidates all known allegations against REL across regulatory agencies, courts, and investigative media from 2013 to 2026. It covers 14 distinct allegations spanning revenue inflation, fund diversion, fake accounting entries, DRI customs violations, Karnataka tax evasion raids, and PLI scheme eligibility.</p>
+</div>
+
+<!-- ALLEGATIONS TABLE SECTION -->
+<div class="section-header">
+  <h2>II. Active Allegations (SEBI — June 2026)</h2>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-active"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-001</div>
+      <div class="allegation-title">Revenue Inflation via Valcambi SA / Overseas Subsidiaries</div>
+      <div class="status-badge badge-active">Active</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">SEBI — Interim Order dated 3 June 2026 (WTM/KCV/IVD-1/001/2026-27)</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">FY 2020-21 to FY 2024-25 (5 years)</div></div>
+      <div class="field-row"><div class="field-key">Quantum</div><div class="field-val"><strong>₹15,15,385 crore (~USD 180 billion)</strong> — alleged misrepresentation of subsidiary revenue</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">Between 97–99% of REL's consolidated revenues were attributed to overseas subsidiaries, primarily Valcambi SA (Switzerland) and Global Gold Refineries AG (GGR). SEBI found Valcambi's own audited standalone financials showed only a small fraction — e.g. CY2023 standalone revenue ~₹542.68 crore vs GGR consolidated ~₹2.93 lakh crore.</div></div>
+      <div class="field-row"><div class="field-key">Structure</div><div class="field-val">REL India → REL Singapore PTE Ltd (95%) → Global Gold Refineries AG (Switzerland) → Valcambi SA. REL Singapore and intermediate entities found to have little or no substantive operations.</div></div>
+      <div class="field-row"><div class="field-key">Co. Response</div><div class="field-val">Valcambi recognises only processing/value-addition revenue; GGR records gross gold transaction value. SEBI found this prima facie unsupported by records or accounting logic.</div></div>
+      <div class="field-row"><div class="field-key">Law</div><div class="field-val">SEBI Act, 1992 ss. 11, 11B; LODR Regs. 4(1)(c), 30, 33; PFUTP Regulations, 2003</div></div>
+      <div class="field-row"><div class="field-key">Impact</div><div class="field-val"><em>₹12,726 crore</em> estimated shareholder wealth erosion; stock down over 50% year-on-year</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-active"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-002</div>
+      <div class="allegation-title">Fake Accounting Entries — Affluence Shares and Stocks Pvt. Ltd.</div>
+      <div class="status-badge badge-active">Active</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">SEBI — Interim Order, 3 June 2026</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">FY 2021-22 to FY 2023-24</div></div>
+      <div class="field-row"><div class="field-key">Quantum</div><div class="field-val">Sales: <strong>₹11,486.60 crore</strong>; Purchases: <strong>₹11,488.42 crore</strong> (~66–67% of standalone revenues)</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">REL's standalone accounts recorded ₹11,487–11,488 crore transactions with Affluence Shares & Stocks Pvt. Ltd. Affluence denied ever having a business relationship with REL. Sales and purchases were nearly equal — no real value addition — the textbook signature of fictitious entries.</div></div>
+      <div class="field-row"><div class="field-key">SEBI Analysis</div><div class="field-val">Entries linked to promoter Rajesh Mehta's personal gold derivative trades, recorded in REL's books as company transactions to artificially inflate standalone turnover.</div></div>
+      <div class="field-row"><div class="field-key">Co. Explanation</div><div class="field-val">Trades intended for MCX but routed through Mehta's personal Affluence account due to MCX litigation. REL transferred ₹7.5 crore to Mehta's personal account for this purpose.</div></div>
+      <div class="field-row"><div class="field-key">Law</div><div class="field-val">SEBI PFUTP Regulations, 2003; Companies Act, 2013 ss. 128, 129, 134; LODR Regulations</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-active"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-003 / A-004</div>
+      <div class="allegation-title">Fund Diversion to Promoter Personal Accounts — Rajesh Mehta & Siddharth Mehta</div>
+      <div class="status-badge badge-active">Active</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">SEBI — Interim Order, 3 June 2026</div></div>
+      <div class="field-row"><div class="field-key">Quantum</div><div class="field-val"><strong>₹339 crore</strong> routed via Rajesh Mehta's personal accounts; total undisclosed related transactions <strong>₹926 crore</strong></div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">Company funds transferred from REL's corporate accounts to personal bank accounts of Rajesh Mehta and Siddharth Mehta without board approval, audit committee approval, or investor disclosure. Funds used for Mehta's personal derivative trading.</div></div>
+      <div class="field-row"><div class="field-key">Gov. Breach</div><div class="field-val">REL's own MD Suresh Gowda and CFO Vijendra Rao stated in depositions they were unaware of material transactions. REL admitted certain transfers were made <em>"without revealing the bank account from which the funds had come."</em></div></div>
+      <div class="field-row"><div class="field-key">Law</div><div class="field-val">Companies Act, 2013 ss. 177, 188; LODR Reg. 23 (related-party transactions); SEBI Act s. 11B</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-active"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-005</div>
+      <div class="allegation-title">Opaque Related-Party Transactions — Elest Pvt. Ltd.</div>
+      <div class="status-badge badge-active">Active</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">SEBI — Interim Order, 3 June 2026</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">FY21 to FY26</div></div>
+      <div class="field-row"><div class="field-key">Quantum</div><div class="field-val">REL transferred <strong>₹565.88 crore</strong> to Elest; Elest returned <strong>₹350.03 crore</strong> → net outflow <strong>₹215.85 crore</strong></div></div>
+      <div class="field-row"><div class="field-key">Background</div><div class="field-val">Elest Pvt. Ltd. incorporated October 2020 by Rajesh Mehta and Prashant Mehta. Engaged in lithium-ion cell manufacturing, battery packs, and EVs. SEBI classified as a related party of REL.</div></div>
+      <div class="field-row"><div class="field-key">SEBI Finding</div><div class="field-val">Fund movements not adequately disclosed as related-party transactions. Board and audit committee approvals not obtained. Responses filed 17 March 2026 require further verification.</div></div>
+      <div class="field-row"><div class="field-key">Law</div><div class="field-val">LODR Reg. 23; Companies Act, 2013 s. 188; SEBI Circular on Related Party Transactions</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-active"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-006</div>
+      <div class="allegation-title">Cross-Holding Scheme — ACC Energy Storage Pvt. Ltd.</div>
+      <div class="status-badge badge-active">Active</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">SEBI — Interim Order, 3 June 2026</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">1 January 2025</div></div>
+      <div class="field-row"><div class="field-key">Quantum</div><div class="field-val">Elest transferred <strong>₹147 crore</strong> to ACC Energy; <strong>₹112 crore returned same day</strong>; ACC subsequently invested ₹262 crore in Elest</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">Cross-holding transferred ~48.95% effective ownership in ACC Energy to Elest (promoter-controlled private entity) without board approval or shareholder disclosure. REL's MD and CFO testified they were unaware of these transactions.</div></div>
+      <div class="field-row"><div class="field-key">PLI Link</div><div class="field-val">ACC Energy Storage Pvt. Ltd. is the vehicle holding REL's PLI entitlement under the ACC Battery Storage scheme. SEBI findings triggered MHI review (see A-010).</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-active"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-007</div>
+      <div class="allegation-title">Unverified Gold Mine Investments in Africa</div>
+      <div class="status-badge badge-active">Active</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">SEBI / NSE — Interim Order, 3 June 2026</div></div>
+      <div class="field-row"><div class="field-key">Quantum</div><div class="field-val"><strong>₹1,035.27 crore</strong> (FY23) under 'other non-current investments' — escalated to <strong>₹10,547.72 crore</strong> by FY25</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">REL told NSE the amount represented "investment in gold mines in Africa." SEBI could not verify this from financial statements or any other available records. No valuation reports, entity-wise breakups, or asset reconciliations produced.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-active"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-008</div>
+      <div class="allegation-title">Failure to Disclose Subsidiary Financials (LODR / Regulation 30)</div>
+      <div class="status-badge badge-active">Active</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">SEBI — Interim Order, 3 June 2026; NSE / BSE queries</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">FY21–FY25 (ongoing)</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">Despite 97–99% of consolidated revenues flowing through overseas subsidiaries, REL did not upload financial statements of any subsidiary on its website. Repeatedly failed to furnish underlying transaction data, customer/vendor details despite multiple SEBI summons.</div></div>
+      <div class="field-row"><div class="field-key">SEBI Note</div><div class="field-val"><em>"A listed entity cannot rely on foreign data-protection regimes (e.g., Swiss banking secrecy) to defeat statutory disclosure obligations under Indian law."</em></div></div>
+      <div class="field-row"><div class="field-key">Law</div><div class="field-val">LODR Regs. 2015 Reg. 30, Schedule III; Companies Act, 2013 s. 136; SEBI Circular CIR/CFD/CMD/56/2016</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- REMEDIATED -->
+<div class="section-header" style="margin-top:40px">
+  <h2>III. Remediated</h2>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-remediated"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-009</div>
+      <div class="allegation-title">Delayed Shareholding Pattern Filings — June & September 2025 Quarters</div>
+      <div class="status-badge badge-remediated">Remediated</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">NSE / BSE — Exchange communications</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">REL failed to submit quarterly shareholding pattern disclosures for two consecutive quarters (June 2025 and September 2025) in breach of SEBI LODR Reg. 31. NSE issued formal communication. REL subsequently filed outstanding disclosures.</div></div>
+      <div class="field-row"><div class="field-key">Note</div><div class="field-val">The pattern of disclosure failures — even when individually remediated — strengthens SEBI's broader case regarding systemic governance deficiencies.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- UNDER REVIEW -->
+<div class="section-header" style="margin-top:40px">
+  <h2>IV. Under Government Review</h2>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-review"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-010</div>
+      <div class="allegation-title">PLI Scheme Eligibility — ACC Battery Storage (MHI Review)</div>
+      <div class="status-badge badge-review">Under Review</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">Ministry of Heavy Industries (MHI)</div></div>
+      <div class="field-row"><div class="field-key">Background</div><div class="field-val">REL was a beneficiary under the PLI scheme for Advanced Chemistry Cell (ACC) battery storage — part of a ₹18,100 crore Union Government programme, executed through ACC Energy Storage Pvt. Ltd.</div></div>
+      <div class="field-row"><div class="field-key">Trigger</div><div class="field-val">SEBI's June 2026 interim order alleging fund diversion, opaque cross-holdings, and governance failures directly connected to ACC Energy and Elest triggered MHI review. Internal ministry view reportedly favours removal.</div></div>
+      <div class="field-row"><div class="field-key">Risk</div><div class="field-val">PLI removal would eliminate government-backed incentive revenues. Final decision pending Union Minister's review of SEBI findings.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORICAL -->
+<div class="section-header" style="margin-top:40px">
+  <h2>V. Historical Allegations (2013–2019)</h2>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-historical"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-011</div>
+      <div class="allegation-title">Illegal Diversion of SEZ Gold to Domestic Market — Cochin SEZ</div>
+      <div class="status-badge badge-historical">Historical</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">Directorate of Revenue Intelligence (DRI), Cochin</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">~2010–2013 (discovered May 2013)</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">Gold imported duty-free for export at Cochin Export Processing Zone illegally diverted to Indian domestic retail market. Senior executive caught at Cochin Railway Station carrying 900g of gold destined for Bengaluru retail.</div></div>
+      <div class="field-row"><div class="field-key">DRI Finding</div><div class="field-val">Activity ongoing ~3 years. Estimated customs duty evaded: <strong>₹90 crore</strong>. Charges framed under Customs Act s.135 — double tax evaded + up to 3 years imprisonment.</div></div>
+      <div class="field-row"><div class="field-key">Stock Impact</div><div class="field-val">REL fell 11% on NSE to ₹109 (then 52-week low)</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-historical"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-012</div>
+      <div class="allegation-title">Non-Bailable Warrant against MD Prashant Mehta — DRI Cochin</div>
+      <div class="status-badge badge-historical">Historical</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">DRI Cochin / Additional Chief Judicial Magistrate, Kerala</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">October 2013</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">ACJM court issued NBW against Prashant J. Mehta (MD) in the Cochin SEZ gold diversion case. Mehta was absconding and had not appeared before DRI despite summons.</div></div>
+      <div class="field-row"><div class="field-key">Context</div><div class="field-val">The same Prashant Mehta co-incorporated Elest Pvt. Ltd. in 2020 and is centrally involved in current SEBI allegations A-005 and A-006.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-historical"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-013</div>
+      <div class="allegation-title">Tax Evasion — Karnataka Commercial Taxes Raid (D.K. Ravi)</div>
+      <div class="status-badge badge-historical">Historical</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">Karnataka Commercial Taxes (Enforcement) Department</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">February 2015</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">IAS officer D.K. Ravi raided REL on 19 February 2015 for suspected tax evasion — part of a broader crackdown recovering ₹138 crore in 2 weeks across Embassy, RMZ, Prestige, Nitesh Builders, and others.</div></div>
+      <div class="field-row"><div class="field-key">Outcome</div><div class="field-val">Ravi died 16 March 2015 (found hanging, Koramangala). CM Siddaramaiah ordered reassessment of inspection report. Final tax demand placed in abeyance — outcome never publicly concluded.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="allegation">
+  <div class="allegation-bar bar-historical"></div>
+  <div class="allegation-inner">
+    <div class="allegation-head">
+      <div class="allegation-id">A-014</div>
+      <div class="allegation-title">Anomalous Surge in Kochi SEZ Jewellery Exports — FY17–FY19</div>
+      <div class="status-badge badge-historical">Historical</div>
+    </div>
+    <div class="allegation-fields">
+      <div class="field-row"><div class="field-key">Authority</div><div class="field-val">Financial Chronicle investigative report; flagged in SEBI context 2026</div></div>
+      <div class="field-row"><div class="field-key">Period</div><div class="field-val">FY 2016-17 to FY 2018-19</div></div>
+      <div class="field-row"><div class="field-key">Allegation</div><div class="field-val">Kochi SEZ gems & jewellery exports surged from negligible (FY16) to <strong>₹40,888 crore</strong> (FY19) after REL commenced operations — while aggregate gold jewellery exports across all other Indian SEZs declined 6% after UAE introduced 5% VAT on gold in 2018.</div></div>
+      <div class="field-row"><div class="field-key">Significance</div><div class="field-val">The single-entity anomalous surge against a sector-wide decline in a post-VAT environment that made gold export uneconomical for other players is now consistent with SEBI's FY21–FY25 revenue misrepresentation findings.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHRONOLOGY -->
+<div class="section-header" style="margin-top:48px">
+  <h2>VI. Regulatory Action Chronology</h2>
+</div>
+<div class="allegation" style="border-radius:4px">
+  <div class="allegation-inner" style="padding-left:20px">
+    <table class="chrono-table">
+      <tr><th style="width:110px">Date</th><th style="width:180px">Authority</th><th>Action</th></tr>
+      <tr><td>May 2013</td><td>DRI Cochin</td><td>Gold seizure at Cochin station; charges framed under Customs Act s.135; ₹90 crore duty evasion alleged</td></tr>
+      <tr><td>Oct 2013</td><td>ACJM Kerala / DRI</td><td>Non-bailable warrant issued against MD Prashant Mehta</td></tr>
+      <tr><td>Feb 2015</td><td>Karnataka CT Dept</td><td>Tax enforcement raid by IAS officer D.K. Ravi on REL; inspection report filed</td></tr>
+      <tr><td>Mar 2015</td><td>Karnataka Govt</td><td>D.K. Ravi found dead; CM orders reassessment of REL inspection report</td></tr>
+      <tr><td>Jul 2015</td><td>NSE / BSE</td><td>REL discloses acquisition of Valcambi SA for USD 400 million; stock hits record high</td></tr>
+      <tr><td>FY17–19</td><td>Financial Chronicle</td><td>Investigative report flags anomalous Kochi SEZ export surge under REL tenure</td></tr>
+      <tr><td>Oct 2020</td><td>MCA</td><td>Elest Pvt. Ltd. incorporated by Rajesh and Prashant Mehta</td></tr>
+      <tr><td>1 Jan 2025</td><td>—</td><td>Elest–ACC cross-holding scheme executed; ₹147 crore transferred, ₹112 crore returned same day</td></tr>
+      <tr><td>Jul 2024</td><td>NSE</td><td>NSE queries ₹1,035 crore 'other non-current investments'; REL claims 'gold mines in Africa'</td></tr>
+      <tr><td>Oct 2024</td><td>SEBI</td><td>Formal investigation initiated; BDO India Services appointed forensic auditor</td></tr>
+      <tr><td>Jun–Sep 2025</td><td>NSE / BSE</td><td>REL fails shareholding pattern filings for two consecutive quarters; NSE issues formal communication</td></tr>
+      <tr><td>Mar 2026</td><td>SEBI</td><td>REL files responses to summons re: Elest, Affluence, and subsidiary financials</td></tr>
+      <tr><td>3 Jun 2026</td><td>SEBI</td><td>109-page ex parte interim order; REL and Rajesh Mehta barred; ₹15.15 lakh crore revenue misrepresentation alleged; forensic audit ordered</td></tr>
+      <tr><td>4 Jun 2026</td><td>REL</td><td>REL files exchange statement calling discrepancy a "communication error"</td></tr>
+      <tr><td>Jun 2026</td><td>MHI</td><td>Ministry of Heavy Industries begins review of REL's PLI scheme eligibility</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- KEY PERSONS -->
+<div class="section-header" style="margin-top:48px">
+  <h2>VII. Key Persons</h2>
+</div>
+<div class="allegation">
+  <div class="allegation-inner" style="padding-left:20px">
+    <table class="persons-table">
+      <tr><th style="width:180px">Name</th><th style="width:200px">Role</th><th>Allegations / Actions</th></tr>
+      <tr><td>Rajesh Mehta</td><td>Executive Chairman</td><td>Barred from securities markets by SEBI (Jun 2026); alleged fund diversion via personal accounts; personal derivative trading with company funds; common director of Elest Pvt. Ltd.</td></tr>
+      <tr><td>Prashant Mehta</td><td>Former MD / Promoter</td><td>NBW issued by Kerala court (Oct 2013) in DRI gold diversion case; co-incorporator of Elest Pvt. Ltd. (2020)</td></tr>
+      <tr><td>Siddharth Mehta</td><td>Promoter family</td><td>Named in SEBI order as recipient of company fund transfers via personal accounts</td></tr>
+      <tr><td>Suresh Gowda</td><td>Managing Director</td><td>Deposed before SEBI; stated unaware of ₹147 crore Elest–ACC transaction and ₹262 crore reverse investment</td></tr>
+      <tr><td>Vijendra Rao</td><td>CFO</td><td>Deposed before SEBI; corroborated MD's unawareness of Elest–ACC transactions</td></tr>
+      <tr><td>Valcambi SA</td><td>Swiss subsidiary (wholly owned)</td><td>At centre of ₹15.15 lakh crore revenue discrepancy; audited standalone revenue fraction of reported consolidated figures</td></tr>
+      <tr><td>Elest Pvt. Ltd.</td><td>Promoter-linked entity</td><td>Alleged fund diversion, undisclosed related-party transactions, cross-holding in ACC Energy Storage</td></tr>
+      <tr><td>ACC Energy Storage</td><td>REL subsidiary (PLI vehicle)</td><td>Subject of circular fund flows with Elest; PLI eligibility under MHI review</td></tr>
+      <tr><td>Affluence Shares & Stocks</td><td>Stockbroker</td><td>Denied any business relationship with REL; confirmed only personal dealings with Rajesh Mehta</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- APPLICABLE LAWS -->
+<div class="section-header" style="margin-top:48px">
+  <h2>VIII. Applicable Laws and Regulations</h2>
+</div>
+<div class="allegation">
+  <div class="allegation-inner" style="padding-left:20px">
+    <table class="laws-table">
+      <tr><th style="width:300px">Provision</th><th>Relevance</th></tr>
+      <tr><td>SEBI Act, 1992 ss. 11, 11B</td><td>SEBI's power to pass interim orders and issue directions to protect investor interests</td></tr>
+      <tr><td>SEBI PFUTP Regulations, 2003</td><td>Prohibition of fraudulent and unfair trade practices; fake entries, revenue inflation, misleading disclosures</td></tr>
+      <tr><td>SEBI LODR Regs. 2015 Reg. 4(1)(c)</td><td>Obligation to make fair, accurate, and timely disclosures</td></tr>
+      <tr><td>SEBI LODR Regs. 2015 Reg. 30</td><td>Continuous disclosure obligations for listed entities including material events</td></tr>
+      <tr><td>SEBI LODR Regs. 2015 Reg. 31</td><td>Quarterly shareholding pattern disclosure (breached Q1 and Q2 FY26)</td></tr>
+      <tr><td>SEBI LODR Regs. 2015 Reg. 23</td><td>Related-party transaction disclosure and approval requirements</td></tr>
+      <tr><td>Companies Act, 2013 ss. 128, 129, 134</td><td>Maintenance of books, financial statements, directors' responsibility</td></tr>
+      <tr><td>Companies Act, 2013 s. 134(8)</td><td>False statements in Directors' Report — offence punishable with fine</td></tr>
+      <tr><td>Companies Act, 2013 ss. 177, 188</td><td>Audit committee and board approval for related-party transactions</td></tr>
+      <tr><td>Companies Act, 2013 s. 136</td><td>Obligation to make subsidiary financial statements available</td></tr>
+      <tr><td>Companies Act, 2013 ss. 241, 242</td><td>NCLT proceedings for oppression and mismanagement</td></tr>
+      <tr><td>Customs Act, 1962 s. 135</td><td>Customs duty evasion — applicable to DRI Cochin SEZ case</td></tr>
+      <tr><td>PMLA, 2002 s. 3</td><td>Money laundering predicate from PFUTP violations and fund diversion</td></tr>
+      <tr><td>FEMA, 1999</td><td>Potential FEMA exposure from overseas subsidiary fund flows</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ANALYTICAL FLAGS -->
+<div class="section-header" style="margin-top:48px">
+  <h2>IX. Audit Observations</h2>
+</div>
+
+<div class="obs-block">
+  <div class="obs-title">7.1 — Pattern of Systemic Non-Disclosure</div>
+  <div class="obs-body"><ul>
+    <li>REL failed to upload subsidiary financial statements for years despite 97–99% of revenues flowing through those subsidiaries — a structural concealment of operational reality.</li>
+    <li>Delayed shareholding pattern filings for two consecutive quarters, combined with Elest transactions, suggest coordinated avoidance of disclosure windows.</li>
+    <li>REL claimed 'gold mines in Africa' for ₹1,035 crore without a single supporting document. This escalated to ₹10,547 crore by FY25.</li>
+  </ul></div>
+</div>
+<div class="obs-block">
+  <div class="obs-title">7.2 — The Valcambi Revenue Architecture</div>
+  <div class="obs-body"><ul>
+    <li>Valcambi processes ~2,000 tonnes/year. At prevailing gold prices this represents USD 55–60 billion in gross throughput. However, Valcambi's own audited accounts show only a fraction as revenue — it recognises processing fees, not gross gold value.</li>
+    <li>Whether REL's consolidation of gross gold value constitutes genuine revenue depends on Ind AS 115 revenue recognition criteria — a critical factual dispute for the forensic audit to resolve.</li>
+    <li>SEBI's finding is prima facie — it means the methodology and documentation were not produced in response to summons, not that fraud is conclusively established.</li>
+  </ul></div>
+</div>
+<div class="obs-block">
+  <div class="obs-title">7.3 — The Affluence Entries: No Legitimate Explanation</div>
+  <div class="obs-body"><ul>
+    <li>Unlike the Valcambi dispute (which has an accounting methodology defence), the Affluence entries have none. Affluence explicitly denied any relationship. Sales and purchases nearly equal — no value addition — the textbook signature of fictitious entries.</li>
+    <li>These entries constituted 66–67% of REL's standalone revenues in the relevant period, making the standalone financial statements substantially unreliable.</li>
+  </ul></div>
+</div>
+<div class="obs-block">
+  <div class="obs-title">7.4 — The Elest–ACC Scheme: Promoter Enrichment</div>
+  <div class="obs-body"><ul>
+    <li>The cross-holding, executed on a single date (1 January 2025), transferred effective majority control of ACC Energy — a public-company subsidiary with PLI benefits — to a privately held promoter entity, without board approval or shareholder disclosure.</li>
+    <li>The same-day ₹147 crore → ₹112 crore round-trip bears hallmarks of artificial capital inflation to justify the ₹60/share valuation for parallel equity subscriptions.</li>
+  </ul></div>
+</div>
+<div class="obs-block">
+  <div class="obs-title">7.5 — Historical Pattern: Not an Isolated Event</div>
+  <div class="obs-body"><ul>
+    <li>The 2013 DRI case, the 2015 Karnataka tax raid, and the FY17–FY19 Kochi SEZ surge collectively indicate that REL's governance deficiencies predate the SEBI order by over a decade.</li>
+    <li>The death of D.K. Ravi shortly after raiding REL, followed by reassessment of his findings, is a contextual fact that strengthens the case for independent institutional oversight of historical enforcement outcomes.</li>
+  </ul></div>
+</div>
+
+<!-- RECOMMENDED ACTIONS -->
+<div class="section-header" style="margin-top:48px">
+  <h2>X. Recommended Regulatory / Legal Actions</h2>
+</div>
+<div class="allegation">
+  <div class="allegation-inner" style="padding-left:20px">
+    <table class="actions-table">
+      <tr><th style="width:40px">#</th><th>Recommended Action</th><th style="width:220px">Forum / Authority</th><th style="width:200px">Basis</th></tr>
+      <tr><td>1</td><td>Complete SEBI forensic audit — full transaction-level reconciliation of Valcambi, GGR, and all subsidiary accounts FY21–FY25</td><td>SEBI / BDO India</td><td>SEBI Interim Order, Jun 2026</td></tr>
+      <tr><td>2</td><td>Pass final order on securities market ban and disgorgement of unlawful gains from Rajesh Mehta</td><td>SEBI WTM</td><td>SEBI Act s. 11B; PFUTP Reg. 11</td></tr>
+      <tr><td>3</td><td>MHI to formally revoke REL's PLI inclusion; recover disbursed PLI amounts if fraud established</td><td>Ministry of Heavy Industries</td><td>PLI Scheme Guidelines; public interest</td></tr>
+      <tr><td>4</td><td>ED investigation under PMLA — money laundering predicate from PFUTP violations and fund diversion</td><td>Enforcement Directorate</td><td>PMLA, 2002 s. 3; Scheduled Offence</td></tr>
+      <tr><td>5</td><td>CBI / DRI — Reopen and conclude the 2013 Cochin SEZ gold diversion case; status of Prashant Mehta NBW</td><td>DRI / CBI</td><td>Customs Act, 1962 s. 135</td></tr>
+      <tr><td>6</td><td>Karnataka CT Dept — Conclude D.K. Ravi's 2015 inspection findings; publish final assessment</td><td>Karnataka Govt / CT Dept</td><td>Public interest; closure of reassessment</td></tr>
+      <tr><td>7</td><td>CAG performance audit of PLI disbursements — examine due diligence on REL's disclosures at time of PLI grant</td><td>Comptroller & Auditor General</td><td>CAG's (DPC) Act, 1971; DPSP Art. 39</td></tr>
+      <tr><td>8</td><td>NCLT proceedings for oppression/mismanagement — minority shareholders' derivative action</td><td>NCLT Bengaluru Bench</td><td>Companies Act, 2013 ss. 241, 242</td></tr>
+      <tr><td>9</td><td>IRDAI / RBI inquiry into insurance and banking exposures to REL given scale of alleged revenue misstatement</td><td>RBI / IRDAI</td><td>Financial stability; credit risk</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- SOURCES -->
+<div class="section-header" style="margin-top:48px">
+  <h2>XI. Sources</h2>
+</div>
+<ul class="source-list">
+  <li><span class="src-bullet">›</span>SEBI Interim Order WTM/KCV/IVD-1/001/2026-27 dated 3 June 2026 (109 pages) — primary source for Allegations A-001 through A-009</li>
+  <li><span class="src-bullet">›</span>Business Standard: 'Sebi bars Rajesh Exports, flags ₹15.15 trn revenue inflation scam' — 3 June 2026</li>
+  <li><span class="src-bullet">›</span>Business Standard: 'Sebi cracks whip on Rajesh Exports promoter over alleged fund diversion' — 3 June 2026</li>
+  <li><span class="src-bullet">›</span>Outlook Business: 'Africa Mines, EV Deals & Unanswered Questions' — 5 June 2026</li>
+  <li><span class="src-bullet">›</span>Outlook Business: 'The Rajesh Exports Case: What SEBI's Interim Order Alleges and What Happens Next' — 5 June 2026</li>
+  <li><span class="src-bullet">›</span>IndMoney: 'Rajesh Exports SEBI Order: What the Alleged ₹15 Lakh Crore Misrepresentation Really Means' — 4 June 2026</li>
+  <li><span class="src-bullet">›</span>The Print: 'Rajesh Exports & its dense web of subsidiaries, revenues, fake transactions that SEBI seeks to detangle' — 5 June 2026</li>
+  <li><span class="src-bullet">›</span>The Wire: 'Rajesh Exports, Now Under Sebi Scrutiny, Was Named Beneficiary of Union Govt PLI' — 5 June 2026</li>
+  <li><span class="src-bullet">›</span>The 420.in: 'Centre Reviews Rajesh Exports' PLI Status After SEBI Fraud Findings' — 7 June 2026</li>
+  <li><span class="src-bullet">›</span>Deccan Chronicle / Financial Chronicle: 'FC Reported Irregularities in Exports by Rajesh Exports During FY17–FY19' — 6 June 2026</li>
+  <li><span class="src-bullet">›</span>Business Standard: 'Rajesh Exports under DRI scanner' — 14 May 2013</li>
+  <li><span class="src-bullet">›</span>Business Standard: 'Non-bailable warrant issued against Rajesh Exports MD' — 8 October 2013</li>
+  <li><span class="src-bullet">›</span>Deccan Herald: 'Raid on Rajesh Exports being reassessed' — 2015</li>
+  <li><span class="src-bullet">›</span>SWI Swissinfo.ch: 'The dark secrets of Switzerland's largest gold refinery' — 15 September 2023</li>
+  <li><span class="src-bullet">›</span>REL 30th Annual Report (FY2023-24) — rajeshindia.com official filing</li>
+  <li><span class="src-bullet">›</span>REL 31st Annual Report (FY2024-25) — rajeshindia.com official filing</li>
+</ul>
+
+<div class="disclaimer">
+  DISCLAIMER: This dossier is an investigative compilation for regulatory and legal reference purposes. All allegations are sourced from regulatory orders, court records, and credentialled press reports. They represent prima facie findings and investigative conclusions, not final judicial determinations. The company's right of response and due process is acknowledged. Document ID: REL-AUDIT-2026-001 · Compiled: 08 June 2026
+</div>
+
+</main>
+
+<footer>
+  <span>REL-AUDIT-2026-001 · Allegations Audit Dossier · 08 June 2026</span>
+  <span>14 Allegations · 2013–2026</span>
+</footer>
+
+</body>
+</html>
